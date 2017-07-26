@@ -1,0 +1,22 @@
+{
+  "name": "ow_stats",
+  "version": "1.0.0",
+  "description": "Overwatch stats ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Double0negative",
+  "license": "ISC",
+  "dependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-node6": "^11.0.0",
+    "canvas": "^1.6.5",
+    "express": "^4.15.3",
+    "jsdom": "^11.0.0",
+    "mysql": "^2.13.0",
+    "pug": "^2.0.0-rc.2",
+    "request": "^2.81.0",
+    "webshot": "^0.18.0"
+  }
+}
