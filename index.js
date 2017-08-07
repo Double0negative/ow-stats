@@ -4,6 +4,7 @@ var request    = require("request");
 var webshot    = require("webshot");
 var sql        = require("./library/sql.js");
 var library    = require("./library/library.js");
+
 const server = express()
 server.set("view engine", "pug")
 
@@ -42,8 +43,8 @@ server.get("/live-stats", function (req, res) {
   library.getStats(req.param("id"), req.param("plat"), function(id, result) {
     console.log("result", result)
 
-    var user = library.rawToStats(result.us.stats);
-    res.render("stats", {user: user})
+    var stats = library.rawToStats(result.us);
+    res.render("live-stats", stats)
   });
 })
 

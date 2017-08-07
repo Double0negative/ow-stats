@@ -2,6 +2,7 @@ var season = 5;
 
 var settings   = require("../settings.json");
 var request    = require("request");
+var ranks      = require("./ranks.js");
 
 module.exports.getStats = function(id, platform,  call) {
   var url = 'http://' + settings.owapi.host + '/api/v3/u/' + id + '/blob?platform=' + platform;
@@ -22,11 +23,11 @@ module.exports.getStats = function(id, platform,  call) {
 
 
 module.exports.rawToStats = function(using) {
-  var stats = using
+  var stats = using;
 //  console.log(stats)
-  using = stats.competitive;
+  using = stats.stats.competitive;
   var stats_ = {
-    stats: stats,
+    stats: stats.stats,
     season: season,
     level: using.overall_stats.level || 0,
     prestige: using.overall_stats.prestige || 0,
@@ -70,7 +71,38 @@ module.exports.rawToStats = function(using) {
     objective_time_avg: using.average_stats.objective_time_avg || 0,
     objective_time_most: using.game_stats.objective_time_most_in_game || 0
   }
-  return stats_;
+
+
+  var playtime = [];
+  var pt = stats.heroes.playtime.competitive;
+  var max = 0;
+  for(var key in pt) {
+    playtime.push({
+      hero: key,
+      playtime: pt[key],
+    });
+    max = Math.max( max , pt[key]);
+  }
+
+  playtime.sort(function(a, b) {
+    return b.playtime - a.playtime
+  })
+
+
+  for(var i = 0; i < playtime.length; i++) {
+    var obj = playtime[i];
+
+    obj.percent = obj.playtime / max;
+    obj.width = 400 * obj.percent;
+
+    console.log(playtime[i])
+  }
+
+
+  stats_.rank_obj = ranks.getRank(stats_.rank);
+  console.log(stats_.rank_obj)
+
+  return {user: stats_, playtime: playtime};
 }
 
 /*

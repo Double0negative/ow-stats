@@ -10,7 +10,7 @@ var sql = mysql.createConnection({
   database : mysqls.db
 });
 
-sql.connect();
+//sql.connect();
 
 var query = {}
 
