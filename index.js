@@ -44,6 +44,8 @@ server.get("/live-stats", function (req, res) {
     console.log("result", result)
 
     var stats = library.rawToStats(result.us);
+
+    stats.user.overwatch_id = req.param("id").replace("-", "#");
     res.render("live-stats", stats)
   });
 })
