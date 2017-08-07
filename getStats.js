@@ -186,7 +186,6 @@ function processResults(user, result) {
       objective_time_most: using.game_stats.objective_time_most_in_game || 0
     }
 
-    stats_.reallevel = stats_.prestige * 100 + stats_.level;
     console.log(stats_)
   var query2 = sql.query("INSERT INTO " + settings.stats.stats_table + " SET ?", stats_, function (err, res, feilds) {
     if(err)

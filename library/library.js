@@ -72,6 +72,7 @@ module.exports.rawToStats = function(using) {
     objective_time_most: using.game_stats.objective_time_most_in_game || 0
   }
 
+  stats_.reallevel = stats_.prestige * 100 + stats_.level;
 
   var playtime = [];
   var pt = stats.heroes.playtime.competitive;
