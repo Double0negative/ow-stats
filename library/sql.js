@@ -54,6 +54,15 @@ query.getPlaytimeByBlob = function(blob, mode, callback) {
   })
 }
 
+query.insertUser = function(user, discord, callback) {
+  sql.query("INSERT INTO users SET ?", user, function(er, res, feilds) {
+    var user = {
+      discord_id: discord,
+      overwatch_id: user,
+    }
+  });
+}
+
  function queryToObject(res, row) {
   var arr = [];
   for (var i = 0; i < res.length; i++) {
