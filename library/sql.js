@@ -54,13 +54,33 @@ query.getPlaytimeByBlob = function(blob, mode, callback) {
   })
 }
 
-query.insertUser = function(user, discord, callback) {
-  sql.query("INSERT INTO users SET ?", user, function(er, res, feilds) {
-    var user = {
-      discord_id: discord,
-      overwatch_id: user,
-    }
+query.removeUser = function(discord, server, owid, call) {
+  sql.query("DELETE FROM users WHERE discord_id=? AND server_id=? AND overwatch_id=?", [discord, server, owid], function(err, res, row) {
+    call(err);
+  })
+}
+
+query.insertUser = function(discord, server, owid, region, platform, callback) {
+  var hash = server+":"+discord;
+
+  sql.query(
+    "INSERT INTO users (hash, discord_id, server_id, overwatch_id, region, platform) " +
+    "VALUES(?,?,?,?,?,?) " +
+    "ON DUPLICATE KEY UPDATE overwatch_id=?, region=?, platform=?",
+    [hash, discord, server, owid, region, platform, owid, region, platform], function(er, res, feilds) {
+    callback(er);
   });
+}
+
+query.getUser = function(discord,server,  callback) {
+  sql.query("SELECT * FROM users WHERE discord_id=? AND server_id=?", [discord, server], function(er, res, row) {
+    if(er) {
+      throw er
+      callback(er)
+    } else {
+      callback(er, queryToObject(res, row));
+    }
+  })
 }
 
  function queryToObject(res, row) {

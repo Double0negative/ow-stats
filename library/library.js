@@ -1,10 +1,13 @@
-var season = 5;
+var season = 6;
 
 var settings   = require("../settings.json");
 var request    = require("request");
 var ranks      = require("./ranks.js");
+const platforms = ["pc", "xbl", "psn"];
 
-module.exports.getStats = function(id, platform,  call) {
+
+
+module.exports.getStatsPlatform = function(id, platform,  call) {
   var url = 'http://' + settings.owapi.host + '/api/v3/u/' + id + '/blob?platform=' + platform;
   console.log("url", url)
     request(url, function(err, res, body) {
@@ -20,6 +23,35 @@ module.exports.getStats = function(id, platform,  call) {
     });
 }
 
+module.exports.getStats = function(id, call) {
+  var getStats = function(id, plat, callback) {
+    module.exports.getStatsPlatform(id, plat, function(id, result) {
+      if(result.error) {
+        console.log("err", result)
+        return callback()
+      }
+      callback(result);
+    });
+  }
+
+  var plat = 0;
+  var callback = function(stats) {
+    console.log("callback", stats)
+    plat++;
+
+    if(stats){
+      console.log("Calling ", stats)
+      call(stats)
+    } else {
+      if(plat > platforms.length) {
+        call();
+        return;
+      }
+      getStats(id, platforms[plat], callback)
+    }
+  }
+  getStats(id, platforms[plat], callback);
+}
 
 
 module.exports.rawToStats = function(using) {

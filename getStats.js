@@ -6,7 +6,8 @@ var mysqls = settings.mysql;
 var platforms = ["pc", "xbl", "psn"];
 var regions   = ["us", "eu", "kr"];
 
-var season = 5;
+var season = 6;
+var total = 0;
 
 var sql = mysql.createConnection({
   host     : mysqls.host,
@@ -18,8 +19,10 @@ var sql = mysql.createConnection({
 sql.connect();
 
 function updateAll() {
-  sql.query("SELECT * FROM users", function(err, res, feilds) {
-    for (var i = 0; i < res.length; i++) {
+  sql.query("SELECT * FROM users", function(err, ress, feilds) {
+    console.log("Updating stats for " + ress.length + " users")
+    for (var ii = 0; ii < ress.length; ii++) {
+      setTimeout(function(res, i) {
       var useri         = res[i]
       var overwatch_id = res[i].overwatch_id;
       var region       = res[i].region;
@@ -28,42 +31,44 @@ function updateAll() {
       if(!region) {
         region = regions[0]
       }
-      if(!platform) {
-        platform = platforms[0]
-      }
 
-      getStats(useri, overwatch_id, platform, function(user, id, result) {
-          if(!result) {
-            console.log(id + "NOt found")
-            var plat = -1;
 
-            var getStatsPlatform = function(user, id, platform, platid) {
-              platid++;
-
-              getStats(user, id, platform, function(user, id, second) {
-                console.log(second)
-                if(second) {
-                  processResults(user, second);
-                } else if(platid < platforms.length){
-                  getStatsPlatform(user, id, platforms[platid], platid);
+      getStats(useri, overwatch_id, platforms[0], function(user, id, result) {
+        if(!result) {
+          getStats(user, id, platforms[1], function(user, id, result) {
+            if(!result) {
+              getStats(user, id, platforms[2], function(user, id, result) {
+                if(result) {
+                  processResults(user, result);
+                } else {
+                  console.log("Not results for ", id)
                 }
-              })
+              });
+            } else {
+              processResults(user, result)
             }
-            getStatsPlatform(user, id, platform, plat);
+          });
         } else {
-          console.log(id + " found")
           processResults(user, result)
         }
-      })
+      });
+    }, 3000 * ii, ress, ii);
     }
   });
+
 }
 
+var statscount = 0;
+var statsTotal = 0;
 function getStats(user, id, platform,  call) {
+  statsTotal ++;
+  console.log("GetStatsTotal", statsTotal)
   var url = 'http://' + settings.owapi.host + '/api/v3/u/' + id + '/blob?platform=' + platform;
-  console.log("url", url)
     request(url, function(err, res, body) {
+      statscount++;
+
       var result;
+      console.log("getStats ", id, statscount)
       if(body) {
         try{
           result = JSON.parse(body);
@@ -75,7 +80,12 @@ function getStats(user, id, platform,  call) {
     });
 }
 
+var processCount = 0;
+var failedCount = 0;
 function processResults(user, result) {
+  processCount++;
+  console.log("processStats ", user.overwatch_id, processCount)
+
   var stats;
   if(user.region) {
     stats = result[user.region];
@@ -85,12 +95,18 @@ function processResults(user, result) {
     stats = result[regions[i++]];
   }
   if(!stats || ! stats.stats) {
-    console.log("RETURN")
+    failedCount++;
+    console.log("No stats for ", user.overwatch_id, failedCount)
     return
   }
 
 
   var time = Date.now();
+  var date = new Date();
+  var year = date.getFullYear();
+  var day = date.getDate();
+  var month = date.getMonth();
+  var hour =  date.getHours();
   var stats_blob = {
     userid: user.id,
     overwatch_id: user.overwatch_id,
@@ -119,13 +135,17 @@ function processResults(user, result) {
         overwatch_id: user.overwatch_id,
         mode: "quickplay",
         hero: key,
-        time: raw.heroes.playtime.quickplay[key]}
+        time: raw.heroes.playtime.quickplay[key],
+        win: raw.heroes.stats.quickplay[key].general_stats.win_percentage
+      }
       var comp = {
         blob_id: blob_id,
         overwatch_id: user.overwatch_id,
         mode: "competitive",
         hero: key,
-        time: raw.heroes.playtime.competitive[key]}
+        time: raw.heroes.playtime.competitive[key],
+        win: raw.heroes.stats.competitive[key].general_stats.win_percentage
+      }
 
       sql.query("INSERT INTO playtime set ?", qp, function(err, res, f) {
         if(err)
@@ -137,11 +157,16 @@ function processResults(user, result) {
       })
     }
 
+
     var stats_ = {
       blob_id: blob_id,
       userid: user.id,
       overwatch_id: user.overwatch_id,
       timestamp: time,
+      year: year,
+      month: month,
+      day: day,
+      hour: hour,
       season: season,
       level: using.overall_stats.level || 0,
       prestige: using.overall_stats.prestige || 0,
@@ -186,10 +211,14 @@ function processResults(user, result) {
       objective_time_most: using.game_stats.objective_time_most_in_game || 0
     }
 
-    console.log(stats_)
   var query2 = sql.query("INSERT INTO " + settings.stats.stats_table + " SET ?", stats_, function (err, res, feilds) {
-    if(err)
-    console.log(err)
+    if(err){
+      console.log(err)
+    }else {
+      total++;
+        console.log("Saved ", stats_.overwatch_id + ", " + total);
+        console.log("");
+    }
 
   });
 
