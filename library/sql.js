@@ -83,6 +83,32 @@ query.getUser = function(discord,server,  callback) {
   })
 }
 
+query.getUsersByServer = function(server, callback) {
+  sql.query(`
+    SELECT * FROM users
+      LEFT JOIN
+        stats ON stats.blob_id = users.blob_id
+      WHERE users.server_id = ?`, [server], function(er, res, row) {
+        if(er)
+          throw er;
+        callback(queryToObject(res, row));
+      })
+}
+
+query.getRankings = function(server, callback) {
+  sql.query(`SELECT *,@curRow := @curRow + 1 as row_number FROM users JOIN (SELECT @curRow := 0) r
+      JOIN stats ON users.id = stats.userid
+      JOIN stats_blob ON stats_blob.id = stats.blob_id
+      JOIN playtime ON playtime.blob_id = stats.blob_id
+      WHERE stats.date=(
+        SELECT stats.date from stats ORDER BY id DESC LIMIT 1
+      )  and users.server_id = ?  ORDER BY stats.rank DESC`, [server], function(er, res, row) {
+      if(er)
+        throw er
+      callback(queryToObject(res, row))
+  });
+};
+
  function queryToObject(res, row) {
   var arr = [];
   for (var i = 0; i < res.length; i++) {
