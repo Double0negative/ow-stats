@@ -1,3 +1,7 @@
 settings.json
 node_modules/
 transfer.json
+package-lock.json
+getStats.js.bak
+transfer.js
+*.bak
