@@ -104,6 +104,10 @@ var hero_static = {
   "soldier76": {
     icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E000000000006E.png",
     color: "rgb(88, 112, 182)"
+  },
+  "moira": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E00000000001A2.png",
+    color: "rgb(105, 28, 207)"
   }
 }
 

@@ -22,19 +22,41 @@ query.getUsers = function(callback) {
 
 
 
-query.getUserStatsByOverwatchId = function(id, callback) {
-  sql.query("SELECT * FROM stats " +
-  "INNER JOIN stats_blob ON stats.blob_id = stats_blob.id WHERE stats.overwatch_id = ? ORDER BY stats.id desc", [id], function(err, res, row) {
-    if(err)
-      throw err
+query.graph = function(id, period, count, callback) {
+  period = period || 3
+  count = count || 24
+  sql.query("SELECT * FROM stats WHERE overwatch_id=? ORDER BY stats.id desc limit 1", [id], function(err1, res1, row1) {
+    if(err1) {
+      callback(err1)
+    }
 
-    var ret = queryToObject(res, row)[0];
-    ret.stats = JSON.parse(ret.stats).stats
-    ret.reallevel = ret.level + ret.prestige * 100
-    ret.rank_obj = ranks.getRank(ret.rank);
-    ret.kdr = Math.round((ret.eliminations / (ret.deaths || 1)) * 100) / 100 ;
-    callback(ret);
-  });
+    var query = queryToObject(res1, row1)[0];
+    var offset = query.id - period;
+
+    sql.query(`
+      SELECT * FROM stats
+      INNER JOIN stats_blob ON stats.blob_id = stats_blob.id
+      WHERE stats.overwatch_id = ? AND ((stats.id - ?) % ?) = 0
+      ORDER BY stats.id desc
+      LIMIT 0,` + count, [id, offset, period], function(err, res, row) {
+        if(err)
+          throw err
+
+        var obj = queryToObject(res, row);
+        for (var i = 0; i < obj.length; i++) {
+          let ret = obj[i];
+          ret.stats = JSON.parse(ret.stats).stats
+          ret.reallevel = ret.level + ret.prestige * 100
+          ret.rank_obj = ranks.getRank(ret.rank);
+          ret.kdr = Math.round((ret.eliminations / (ret.deaths || 1)) * 100) / 100 ;
+        }
+
+        callback(obj);
+    });
+
+  })
+
+
 }
 
 query.getPlaytimeByBlob = function(blob, mode, callback) {
@@ -74,12 +96,13 @@ query.insertUser = function(discord, server, owid, region, platform, callback) {
 
 query.getUser = function(discord,server,  callback) {
   sql.query("SELECT * FROM users WHERE discord_id=? AND server_id=?", [discord, server], function(er, res, row) {
-    if(er) {
-      throw er
-      callback(er)
-    } else {
       callback(er, queryToObject(res, row));
-    }
+  })
+}
+
+query.getUserByOwid = function(id, callback) {
+  sql.query("SELECT * FROM users WHERE overwatch_id=?", [id], function(err, res, row) {
+      callback(err, queryToObject(res, row))
   })
 }
 

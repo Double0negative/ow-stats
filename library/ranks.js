@@ -1,8 +1,14 @@
 var ranks =  [
 			{
+				"name": "Unranked",
+				"role": "Unranked",
+				"rank": -1,
+				"color": "#FFFFFF",
+				"img": "https://blzgdapipro-a.akamaihd.net/game/rank-icons/season-2/rank-1.png"
+			},{
 				"name": "Bronze",
 				"role": "Bronze",
-				"rank": -2,
+				"rank": 1,
 				"color": "#7A5501",
 				"img": "https://blzgdapipro-a.akamaihd.net/game/rank-icons/season-2/rank-1.png"
 			},{

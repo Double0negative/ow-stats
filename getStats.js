@@ -6,7 +6,7 @@ var mysqls = settings.mysql;
 var platforms = ["pc", "xbl", "psn"];
 var regions   = ["us", "any", "eu", "kr"];
 
-var season = 6;
+var season = 9;
 var total = 0;
 
 var sql = mysql.createConnection({
@@ -64,7 +64,7 @@ var statscount = 0;
 var statsTotal = 0;
 function getStats(user, id, platform,  call) {
   statsTotal ++;
-  console.log("GetStatsTotal", statsTotal)
+  console.log("GetStatsTotal", user, id, platform, statsTotal)
   var url = 'http://' + settings.owapi.host + '/api/v3/u/' + id + '/blob?platform=' + platform;
     request(url, function(err, res, body) {
       statscount++;
@@ -111,7 +111,7 @@ function processResults(user, result) {
   var date = new Date();
   var year = date.getFullYear();
   var day = date.getDate();
-  var month = date.getMonth();
+  var month = date.getMonth() + 1;
   var hour =  date.getHours();
   var stats_blob = {
     userid: user.id,
@@ -131,7 +131,7 @@ function processResults(user, result) {
     var using = stats.competitive;
     var blob_id = res.insertId;
 
-    if(!using) {
+    if(!using || !using.overall_stats) {
       return
     }
 

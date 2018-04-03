@@ -4,14 +4,23 @@ html
     script(src="/scripts/colors.js")
 
     style.
-      body { 
+      body {
         background: white;
       }
-    
+
+      .chart-container {
+        width: 90%;
+        margin: auto;
+        margin-top: 30px;
+      }
+
   body
-    canvas#chart
+    .title
+      h1=id
+    .chart-container
+      canvas#chart
     script.
       var stats = !{JSON.stringify(stats)};
-      var keySet = ["loss", "wins"];
+      var keySet = !{JSON.stringify(keys)};
       console.log(keySet)
-    script(src="/scripts/stacked.js")
+    script(src="/scripts/line.js")

@@ -104,18 +104,23 @@ server.get("/add-user", function(req, res) {
 
 
 server.get("/get-user", function(req, res) {
-  sql.getUser(req.query.discord, req.query.server, function (er, player) {
+  var callback = function (er, player) {
     if(er) {
       console.log("Error getting user ", er)
       res.send({status: 500, msg: "Failed to get user"})
     }
-    console.log(player)
     if(player && player[0]) {
       res.send(player[0]);
     } else {
       err(res, 404, "Profile not found")
     }
-  })
+  }
+
+  if(req.query.owid) {
+    sql.getUserByOwid(req.query.owid, callback);
+  } else {
+    sql.getUser(req.query.discord, req.query.server, callback)
+  }
 })
 var graphDef = {
 
@@ -137,8 +142,8 @@ function err(res, status, msg) {
 }
 
 server.get("/graph", function(req, res) {
-  sql.getUserStatsByOverwatchId(req.param("id"), function(stats) {
-    res.render("graph", {stats: stats});
+  sql.graph(req.query.id, req.query.period, req.query.count, function(stats) {
+    res.render("graph", {id: req.query.overwatch_id, stats: stats.reverse(), keys: (req.query.keys || 'rank').split(",")});
   })
 })
 

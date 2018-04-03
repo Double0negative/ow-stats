@@ -6,6 +6,10 @@ html
       font-family: 'owfont';
       src: url('/fonts/owfont.ttf');
     }
+    @font-face {
+      font-family: 'roboto';
+      src: url('/fonts/roboto.ttf');
+    }
     body {
       background: #ddd;
       font-family: 'owfont';
@@ -44,7 +48,7 @@ html
     .body {
       font-size: 20px;
       padding: 10px;
-      font-family: 'Roboto Condensed', sans-serif;
+      font-family: 'roboto';
       text-align: center;
     }
     .body-cell {
@@ -57,7 +61,7 @@ html
       text-align: right;
     }
     .body-cell th {
-      font-size: 25px;
+      font-size: 20px;
     }
     .body-cell td {
       font-size: 17px;
@@ -86,7 +90,7 @@ html
       div.inline#title
         h1=user.overwatch_id
         h2 Level: #{user.reallevel}
-        h2 Season 6, #{user.time_played}hrs
+        h2 Season 9, #{user.time_played}hrs
       div.inline.rank
         img(src=user.ranking.img height="80")
         div.comp-rank=user.rank
