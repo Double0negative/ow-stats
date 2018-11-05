@@ -48,7 +48,7 @@ window.onload = function() {
 function labels(stats) {
   var labels = [];
   for (var i = 0; i < stats.length; i++) {
-    labels.push(stats[i].timestamp);
+    labels.push(stats[i].month + "-" + stats[i].day + " " + stats[i].hour + ":00");
   }
   return labels;
 }

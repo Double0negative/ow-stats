@@ -1,0 +1,122 @@
+html
+  head
+    link(rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fjalla+One|Oswald|Roboto+Condensed")
+  style.
+    @font-face {
+      font-family: 'owfont';
+      src: url('/fonts/owfont.ttf');
+    }
+    body {
+      background: #ddd;
+      font-family: 'owfont';
+      font-size: 27px;
+    }
+    .inline {
+      display: inline-block;
+      vertical-align: middle;
+    }
+    #title {
+
+      width: 100%;
+    }
+    h1, h2, h3, h4 {
+      padding: 0px;
+      margin: 1px;
+    }
+    .top {
+      background: #fdfdfd;
+      padding: 10px;
+    }
+    .header {
+      background: #efefef;
+      padding: 10px;
+    }
+    .body-title {
+      text-align: center;
+    }
+    .rank {
+      text-align: center;
+      vertical-align: middle;
+    }
+    .comp-rank {
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .rank {
+      font-weight: bold;
+    }
+    .container {
+      height: 35px;
+      margin: 5px;
+      box-shadow: 0 0 1px 0px #000;
+
+    }
+    .odd {
+      background: #eee;
+    }
+    .wrap {
+      display: inline-block;
+      vertical-align: top;
+    }
+    h1 {
+      text-align: center;
+    }
+    .ranking {
+      background-color: rgb(144, 33, 191);
+      color: white;
+      width: 80px;
+      padding: 0 10px;
+    }
+    .container .inline {
+      height: 100%;
+      vertical-align: middle;
+      line-height: 35px;
+    }
+    .pos {
+      width: 20px;
+      text-align: right;
+      padding-right: 5px;
+    }
+    .avatar {
+      margin-right: 5px;
+    }
+    .player {
+      width: 150px;
+    }
+    .icons {
+      text-align: right;
+      width: 120px;
+    }
+    .center {
+      text-align: center;
+      background-color: white;
+    }
+  body
+    if header
+      div.top
+        div#title
+          h1 Rankings
+ 
+    #title
+      h3.center 
+        span=min
+        span -
+        span=max
+
+    -
+      var split = [players.slice(0, len ), players.slice(len, len * 2), players.slice(len * 2 , len * 3)]
+
+    each group, index in split
+      div.wrap
+        each player, i in group
+          div.container(class=i % 2 == 0 ? "even" : "odd")
+            span.inline.pos=player.row_number
+            div.inline.ranking
+              img.inline(src=player.ranking.img height="25")
+              span.inline.rank=player.rank
+            img.inline.avatar(src=player.stats.stats.quickplay.overall_stats.avatar height="35")
+            span.inline.player=player.overwatch_id.split("-")[0]
+            div.inline.icons
+              each j in [0, 1, 2]
+                if(player.playtime[j].playtime > 0)
+                  img(src=player.playtime[j].icon height="35px")

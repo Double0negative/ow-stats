@@ -1,0 +1,166 @@
+html
+  head
+    link(rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fjalla+One|Oswald|Roboto+Condensed")
+  style.
+    @font-face {
+      font-family: 'owfont';
+      src: url('/fonts/owfont.ttf');
+    }
+    @font-face {
+      font-family: 'roboto';
+      src: url('/fonts/roboto.ttf');
+    }
+    body {
+      background: #222;
+      font-family: 'owfont';
+      color: white;
+    }
+    .inline {
+      display: inline-block;
+      vertical-align: middle;
+    }
+    #title {
+      padding-left: 10px;
+      width: 430px;
+    }
+    h1, h2, h3, h4 {
+      padding: 0px;
+      margin: 1px;
+    }
+    .top {
+      background: #444;
+      padding: 10px;
+    }
+    .header {
+      background: #555;
+      padding: 10px;
+    }
+    .body-title {
+      text-align: center;
+    }
+    .rank {
+      text-align: center;
+      vertical-align: middle;
+    }
+    .comp-rank {
+      font-size: 25px;
+      font-weight: bold;
+    }
+    .body {
+      font-size: 20px;
+      padding: 10px;
+      font-family: 'roboto';
+      text-align: center;
+    }
+    .body-cell {
+      display: inline-block;
+      padding: 5px 10px;
+      text-transform: uppercase;
+      vertical-align: top;
+    }
+    .tdh {
+      text-align: right;
+    }
+    .body-cell th {
+      font-size: 20px;
+    }
+    .body-cell td {
+      font-size: 17px;
+    }
+    .body-cell table {
+      border-collapse: collapse;
+    }
+    .time-title {
+      width: 70px;
+      text-align: right;
+    }
+    .time-cell {
+      width: 410px
+    }
+    .time-progress{
+      background: black;
+      height: 10px;
+    }
+    .tt {
+      margin: auto;
+    }
+  body
+    div.top
+      div.inline
+        img#avatar(src=user.stats.quickplay.overall_stats.avatar height="100")
+      div.inline#title
+        h1=user.overwatch_id
+        h2 Level: #{user.reallevel}
+        h2 Season 9, #{user.time_played}hrs
+      div.inline.rank
+        img(src=user.ranking.img height="80")
+        div.comp-rank=user.rank
+    div.header
+      h1.body-title Competitive stats
+
+    .body
+      div.body-cell
+        table
+          tr
+            th(colspan="2") Games
+          tr
+            td.tdh Played:
+            td=user.games
+          tr
+            td.tdh Wins:
+            td=user.wins
+          tr
+            td.tdh Win Rate:
+            td #{user.winrate}%
+      div.body-cell
+        table
+          tr
+            th(colspan="2") eliminations
+          tr
+            td.tdh total:
+            td=user.eliminations
+          tr
+            td.tdh average:
+            td=user.eliminations_avg
+          tr
+            td.tdh Most:
+            td=user.eliminations_most
+      div.body-cell
+        table
+          tr
+            th(colspan="2") damage
+          tr
+            td.tdh total:
+            td=user.damage
+          tr
+            td.tdh average:
+            td=user.damage_avg
+          tr
+            td.tdh Most:
+            td=user.damage_most
+      div.body-cell
+        table
+          tr
+            th(colspan="2") Healing
+          tr
+            td.tdh total:
+            td=user.healing
+          tr
+            td.tdh average:
+            td=user.healing_avg
+          tr
+            td.tdh Most:
+            td=user.healing_most
+
+    div.header
+      h1.body-title Heros
+
+
+    each val in [0,1,2,3,4]
+      table.tt
+        tr
+          td.time-title=playtime[val].hero
+          -var style = "width: " + playtime[val].percent * 400.0 + "px; background-color: " + user.hero_static[playtime[val].hero].color
+          td.time-cell
+            div.time-progress(style=style)
+          td #{Math.ceil(playtime[val].playtime)}h, #{Math.ceil(playtime[val].win * 100)}%

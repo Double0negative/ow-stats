@@ -1,31 +1,183 @@
-var season = 5;
+var season = 10;
 
 var settings   = require("../settings.json");
 var request    = require("request");
 var ranks      = require("./ranks.js");
+const platforms = ["pc", "xbl", "psn"];
+var hero_static = {
+  "winston": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E0000000000009.png",
+    color: "rgb(76, 80, 92)"
+  },
+  "junkrat": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E0000000000065.png",
+    color: "rgb(211, 147, 8)"
+  },
+  "symmetra": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E0000000000016.png",
+    color: "rgb(92, 236, 255)"
+  },
+  "widowmaker": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E000000000000A.png",
+    color: "rgb(111, 111, 174)"
+  },
+  "torbjorn": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E0000000000006.png",
+    color: "rgb(255, 98, 0)"
+  },
+  "genji":  {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E0000000000029.png",
+    color: "rgb(132, 254, 1)"
+  },
+  "mccree": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E0000000000042.png",
+    color: "rgb(141, 57, 57)"
+  },
+  "doomfist": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E000000000012F.png",
+    color: "rgb(224, 78, 52)"
+  },
+  "ana": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E000000000013B.png",
+    color: "rgb(204, 194, 174)"
+  },
+  "reinhardt": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E0000000000007.png",
+    color: "rgb(170, 149, 142)"
+  },
+  "sombra": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E000000000012E.png",
+    color: "rgb(117, 27, 156)"
+  },
+  "mei": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E00000000000DD.png",
+    color: "rgb(154, 219, 244)"
+  },
+  "tracer": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E0000000000003.png",
+    color: "rgb(248, 145, 27)"
+  },
+  "hanzo": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E0000000000005.png",
+    color: "rgb(147, 136, 72)"
+  },
+  "orisa": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E000000000013E.png",
+    color: "rgb(220, 154, 0)"
+  },
+  "bastion": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E0000000000015.png",
+    color: "rgb(110, 153, 77)"
+  },
+  "reaper": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E0000000000002.png",
+    color: "rgb(39, 39, 37)"
+  },
+  "zarya": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E0000000000068.png",
+    color: "rgb(245, 113, 168)"
+  },
+  "lucio": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E0000000000079.png",
+    color: "rgb(139, 236, 34)"
+  },
+  "zenyatta": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E0000000000020.png",
+    color: "rgb(199, 156, 0)"
+  },
+  "mercy": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E0000000000004.png",
+    color: "rgb(255, 225, 108)"
+  },
+  "pharah": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E0000000000008.png",
+    color: "rgb(27, 101, 198)"
+  },
+  "roadhog": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E0000000000040.png",
+    color: "rgb(193, 148, 119)"
+  },
+  "dva":{
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E000000000007A.png",
+    color: "rgb(255, 127, 209)"
+  },
+  "soldier76": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E000000000006E.png",
+    color: "rgb(88, 112, 182)"
+  },
+  "moira": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E00000000001A2.png",
+    color: "rgb(105, 28, 207)"
+  },
+  "brigitte": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E0000000000195.png",
+    color: "rgb(115, 52, 43)"
+  },
+  "wrecking_ball": {
+    icon: "https://d1u1mce87gyfbn.cloudfront.net/game/heroes/small/0x02E00000000001CA.png",
+    color: "rgb(255, 142, 71)"
+  }
+}
 
-module.exports.getStats = function(id, platform,  call) {
-  var url = 'http://' + settings.owapi.host + '/api/v3/u/' + id + '/blob?platform=' + platform;
+module.exports.hero_static = hero_static;
+
+
+module.exports.getStatsPlatform = function(id, platform,  call) {
+  var url = 'http://' + settings.owapi.host + '/api/v3/u/' + encodeURIComponent(id) + '/blob?platform=' + platform;
   console.log("url", url)
     request(url, function(err, res, body) {
-      var result;
+      var result = {};
       if(body) {
         try{
+          console.log("Body", body)
           result = JSON.parse(body);
         } catch (e) {
-
+          console.log("err", e)
         }
       }
+      //result.error = err;
       call(id, result);
     });
 }
 
+module.exports.getStats = function(id, call) {
+  console.log("GetSTats")
+  var getStats = function(id, plat, callback) {
+    console.log("GetSTats", id, plat)
+    module.exports.getStatsPlatform(id, plat, function(id, result) {
+      if(result.error) {
+        console.log("err", result)
+        return callback()
+      }
+      callback(result);
+    });
+  }
+
+  var plat = 0;
+  var callback = function(stats) {
+    //console.log("callback", stats)
+    plat++;
+
+    if(stats){
+      //console.log("Calling ", stats)
+      call(stats)
+    } else {
+      if(plat > platforms.length) {
+        call();
+        return;
+      }
+      getStats(id, platforms[plat], callback)
+    }
+  }
+  getStats(id, platforms[plat], callback);
+}
 
 
 module.exports.rawToStats = function(using) {
   var stats = using;
-//  console.log(stats)
+  console.log("stats-------", stats)
   using = stats.stats.competitive;
+
   var stats_ = {
     stats: stats.stats,
     season: season,
@@ -78,10 +230,20 @@ module.exports.rawToStats = function(using) {
   var pt = stats.heroes.playtime.competitive;
   var max = 0;
   for(var key in pt) {
-    playtime.push({
+    console.log(key)
+    var obj = {
       hero: key,
       playtime: pt[key],
-    });
+    }
+    if(stats.heroes.stats.competitive[key]) {
+      obj.win = stats.heroes.stats.competitive[key].general_stats.win_percentage
+    } else {
+      obj.win = 0;
+    }
+    playtime.push(obj);
+
+
+
     max = Math.max( max , pt[key]);
   }
 
@@ -94,14 +256,13 @@ module.exports.rawToStats = function(using) {
     var obj = playtime[i];
 
     obj.percent = obj.playtime / max;
-    obj.width = 400 * obj.percent;
 
     console.log(playtime[i])
   }
 
 
-  stats_.rank_obj = ranks.getRank(stats_.rank);
-  console.log(stats_.rank_obj)
+  stats_.ranking = ranks.getRank(stats_.rank);
+  stats_.hero_static = hero_static;
 
   return {user: stats_, playtime: playtime};
 }
